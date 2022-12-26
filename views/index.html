@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://bootswatch.com/5/materia/bootstrap.min.css">
+    <style>
+        #logout,
+        #profile {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '3199807830232972',
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v15.0'
+            });
+            FB.getLoginStatus(function (response) {
+                statusChangeCallback(response);
+            });
+        };
+
+        function statusChangeCallback(response) {
+            if (response.status == 'connected') {
+                setElements(true);
+                testAPI();
+            }
+            else {
+                setElements(false);
+            }
+        }
+
+        function checkLoginState() {
+            FB.getLoginStatus(function (response) {
+                statusChangeCallback(response);
+            });
+        }
+
+        function logout() {
+            FB.logout((response) => {
+                setElements(false);
+            });
+        }
+
+        function setElements(isLoggedIn) {
+            if (isLoggedIn) {
+                document.getElementById('fb-btn').style.display = 'none';
+                document.getElementById('logout').style.display = 'block';
+                document.getElementById('profile').style.display = "block";
+                document.getElementById('header').innerHTML = 'Your Profile';
+            }
+            else {
+                document.getElementById('fb-btn').style.display = 'block';
+                document.getElementById('logout').style.display = 'none';
+                document.getElementById('profile').style.display = "none";
+                document.getElementById('header').innerHTML = 'Log in to view your profile';
+
+            }
+        }
+
+        function testAPI() {
+            FB.api('/me?fields=name,email,birthday', (response) => {
+                if (response && !response.error) {
+                    buildProfile(response);
+                }
+            });
+        }
+
+        function buildProfile(user) {
+            let profile = `
+            <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+            <div class="card-header">${user.name}</div>
+            <div class="card-body">
+                <h4 class="card-title">${user.email}</h4>
+                <p class="card-text">${user.birthday}</p>
+            </div>
+            </div>            
+            `;
+
+            document.getElementById('profile').innerHTML = profile;
+        }
+
+    </script>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+    <nav class="navbar navbar-expand navbar-dark bg-primary" aria-label="Second navbar example">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Logo</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample02"
+                aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarsExample02">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                </ul>
+                <fb:login-button id="fb-btn" scope="public_profile,email, user_birthday" onlogin="checkLoginState();">
+                </fb:login-button>
+
+                <button type="button" id="logout" class="btn btn-warning" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+
+
+    <div id="container" style="margin: 0 50px;">
+        <h2 id="header" style="margin: 20px 0;">Log in to see your info</h2>
+        <div id="profile">
+
+        </div>
+    </div>
+
+</body>
+
+</html>
